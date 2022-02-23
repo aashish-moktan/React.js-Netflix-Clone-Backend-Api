@@ -18,6 +18,7 @@ app.use('/api/auth',authRouter);
 mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.qsz1e.mongodb.net/netflix?retryWrites=true&w=majority`,{
     useNewUrlParser:true,
     useUnifiedTopology:true
+    // useCreateIndex: true
 }).then(()=>{
     console.log('Successfully connected to database');
 }).catch(()=>{
