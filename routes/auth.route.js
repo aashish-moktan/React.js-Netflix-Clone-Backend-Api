@@ -9,14 +9,15 @@ router.post('/register',async (request,response)=>{
     const data = {
         username: request.body.username,
         email: request.body.email,
-        password: CryptoJS.AES.encrypt(request.body.password,process.env.SECRET_KEY)
+        password: CryptoJS.AES.encrypt(request.body.password,process.env.SECRET_KEY).toString()
     }
     try{
         const insertResponse = await new UserSchema(data).save();
         response.status(201).json(insertResponse);
     }
     catch(error){
-        response.status(500).json(error);
+        if(error.code == 11000 && error.keyPattern.email == 1) response.status(409).json({message:'Email already exist\'s'});
+        else response.status(500).json({message: 'Failed to create user.Please try again!!!'});
     }
 });
 
@@ -26,7 +27,7 @@ router.post('/login', async (request, response) => {
         const user = await UserSchema.findOne({"email":request.body.email});
         !user && response.status(401).json({message:'User not found'});
         // decrypt password
-        var bytes  = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
+        var bytes  = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY).toString();
         var originalPassword = bytes.toString(CryptoJS.enc.Utf8);
         request.body.password != originalPassword && response.status(401).json({message:'Username or password didn\'t match'});
         const token = jwt.sign({id:user._id, isAdmin:user.isAdmin},process.env.SECRET_KEY,{expiresIn:'5d'});
