@@ -121,83 +121,25 @@ router.get('/random', async(request, response)=>{
         }
     }
     catch(error){
-        console.log(error);
-        response.status(500).json(error);
+        response.status(500).json({message: 'Failed to get data. Please try again'});
     }
 });
 
 
-
-/*
-// GET USER
-router.get('/find/:id', async (request, response)=>{
+// GET ALL MOVIES
+router.get('/',async (request, response)=>{
     try {
-        console.log(request.params.id);
-        const userData = await UserSchema.findById(request.params.id);
-        if(userData == null){
-            response.status(404).json({message: 'Sorry user not found'});
+        const moviesData = await MovieSchema.find().sort({_id: -1});
+        if(moviesData.length == 0){
+            response.status(404).json({message: 'Movies not found !!!'});
         }
         else{
-            response.status(200).json(userData);
+            response.status(200).json(moviesData);
         }
     }
     catch(error){
-        response.status(500).json({message:'Internal server error'});
+        response.status(500).json({message:'Failed to get movies. Please try again !!!'});
     }
 });
-
-// GET ALL USER
-router.get('/',verifyToken, async (request, response)=>{
-    if(request.user.isAdmin){
-        const userData = request.query.new ? await UserSchema.find().limit(10) : await UserSchema.find();
-        if(userData == null){
-            response.status(404).json({message:'Users not found'});
-        }
-        else {
-            response.status(200).json(userData);
-        }
-    }
-    else{
-        response.status(401).json({message:'You are not allowed to see all users!!!'});
-    }
-});
-// GET USER STATS
-router.get('/stats',async (request, response)=>{
-    const today = new Date();
-    const lastYear = today.setFullYear(today.getFullYear() - 1);
-    const monthsArray = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "November",
-        "December"
-    ]
-    try {
-        const allData = await UserSchema.aggregate([
-            {
-                $project: {
-                    month: {$month:"$createdAt"}
-                }
-            },
-            {
-                $group: {
-                    _id: "$month",
-                    total: {$sum : 1}
-                } 
-            }
-        ]);
-        response.status(200).json(allData);
-    }
-    catch(error){
-        response.status(500).json(error);
-    }
-});
-*/
 
 module.exports = router;
