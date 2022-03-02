@@ -58,6 +58,28 @@ router.put('/:id', verifyToken, async (request, response)=>{
     }
 });
 
+// DELETE
+router.delete('/:id', verifyToken, async (request, response)=>{
+    if(request.user.isAdmin){
+        try{
+            const deleteRes = await MovieSchema.findByIdAndDelete(request.params.id,{new:true});
+            if(deleteRes == null){
+                response.status(404).json({message: 'Sorry movie not found !!!'});
+            }
+            else{
+                response.status(200).json(deleteRes);
+            }
+        }
+        catch(error){
+            response.status(500).json({message:'Failed to delete movie'});
+        }
+    }
+    else{
+        response.status(401).json({message:'Unauthorized'});
+    }
+});
+
+
 /*
 // GET USER
 router.get('/find/:id', async (request, response)=>{
