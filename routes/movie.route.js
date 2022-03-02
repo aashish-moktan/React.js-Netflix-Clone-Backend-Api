@@ -95,6 +95,38 @@ router.get('/find/:id',async (request, response)=>{
     }
 });
 
+// GET RANDOM MOVIE OR SERIES
+router.get('/random', async(request, response)=>{
+    try{
+        const type = request.query.type;
+        let aggregation;
+        if(type === "movie"){
+            aggregation = [
+                {$match: { isSeries: false }},
+                {$sample: { size: 1 }}
+            ]
+        }
+        else{
+            aggregation = [
+                {$match: { isSeries: true}},
+                {$sample: { size: 1}}
+            ]
+        }
+        const movieData = await MovieSchema.aggregate(aggregation);
+        if(movieData.length == 0){
+            response.status(404).json({message:'Data not found !!!'});
+        }
+        else {
+            response.status(200).json(movieData);
+        }
+    }
+    catch(error){
+        console.log(error);
+        response.status(500).json(error);
+    }
+});
+
+
 
 /*
 // GET USER
