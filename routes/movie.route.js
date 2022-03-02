@@ -79,6 +79,22 @@ router.delete('/:id', verifyToken, async (request, response)=>{
     }
 });
 
+// GET MOVIE BY ID
+router.get('/find/:id',async (request, response)=>{
+    try{
+        const movieData = await MovieSchema.findById(request.params.id);
+        if(movieData == null){
+            response.status(404).json({message:'Movie not found !!!'});
+        }
+        else{
+            response.status(200).json(movieData);
+        }
+    }
+    catch(error){
+        response.status(500).json({message:'Failed to get movie info'});
+    }
+});
+
 
 /*
 // GET USER
