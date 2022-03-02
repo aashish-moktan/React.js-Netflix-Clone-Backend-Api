@@ -25,14 +25,22 @@ router.post('/register',async (request,response)=>{
 router.post('/login', async (request, response) => {
     try{
         const user = await UserSchema.findOne({"email":request.body.email});
-        !user && response.status(401).json({message:'User not found'});
-        // decrypt password
-        var bytes  = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY).toString();
-        var originalPassword = bytes.toString(CryptoJS.enc.Utf8);
-        request.body.password != originalPassword && response.status(401).json({message:'Username or password didn\'t match'});
-        const token = jwt.sign({id:user._id, isAdmin:user.isAdmin},process.env.SECRET_KEY,{expiresIn:'5d'});
-        const {password, ...obj} = user._doc;
-        response.status(200).json({...obj,token});
+        if(user == null){
+            response.status(404).json({message:'User not found'});
+        }
+        else{
+            // decrypt password
+            var bytes  = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY);
+            var originalPassword = bytes.toString(CryptoJS.enc.Utf8);
+            if(request.body.password != originalPassword){
+                response.status(401).json({message:'Username or password didn\'t match'});
+            }
+            else{
+                const token = jwt.sign({id:user._id, isAdmin:user.isAdmin},process.env.SECRET_KEY,{expiresIn:'5d'});
+                const {password, ...obj} = user._doc;
+                response.status(200).json({...obj,token});   
+            }
+        }
     }
     catch(error){
         response.status(500).json(error);

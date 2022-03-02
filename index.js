@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const urlEncoder = bodyParser.urlencoded({extended:false});
 const jsonEncoder = bodyParser.json();
 const authRouter = require('./routes/auth.route');
+const userRouter = require('./routes/user.route');
 
 // setting body parser
 app.use(urlEncoder);
@@ -13,6 +14,7 @@ app.use(jsonEncoder);
 
 // setting route for auth
 app.use('/api/auth',authRouter);
+app.use('/api/user',userRouter);
 
 // setting up database
 mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.qsz1e.mongodb.net/netflix?retryWrites=true&w=majority`,{
