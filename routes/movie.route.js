@@ -42,28 +42,23 @@ router.post('/',verifyToken, async (request, response)=>{
     }
 });
 
-/*
-// DELETE
-router.delete('/:id', verifyToken, async (request, response)=>{
-    if(request.params.id === request.user.id || request.user.isAdmin){
+// UPDATE
+router.put('/:id', verifyToken, async (request, response)=>{
+    if(request.user.isAdmin){
         try{
-            const deleteRes = await UserSchema.findByIdAndDelete(request.user.id);
-            if(deleteRes == null){  
-                response.status(404).json({message:'User doesn\'t exist'});
-            }
-            else{
-                response.status(200).json(deleteRes);
-            }
+            const updateRes = await MovieSchema.findByIdAndUpdate(request.params.id, request.body,{new:true});
+            response.status(200).json(updateRes);
         }
         catch(error){
-            response.status(500).json(error);
+            response.status(500).json({message:'Failed to update movie. Please try again !!!'});
         }
     }
     else{
-        response.status(401).json({message:'You can only delete your account'});
+        response.status(401).json({message:'Unauthorized'});
     }
 });
 
+/*
 // GET USER
 router.get('/find/:id', async (request, response)=>{
     try {
